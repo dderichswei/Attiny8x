@@ -187,7 +187,7 @@ ISR(PCINT0_vect) {
 }
 
 ISR(PCINT1_vect) {
-  slept = true;
+  slept = true; 
   digitalWrite(GREENLED, HIGH);
   digitalWrite(DIODE, HIGH);
   //radio.powerUp();
