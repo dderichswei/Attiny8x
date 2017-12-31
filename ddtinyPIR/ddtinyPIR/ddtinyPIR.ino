@@ -55,8 +55,11 @@
 #define CSN_PIN 7         // 7 select Counterclockwise for PIN MAPPING in ARDUINO
 RF24 radio(CE_PIN, CSN_PIN);
 
-byte addresses[][6] = {"1Node","2Node"};
+// Topology and Payload
+//byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
+const int max_payload_size = 32;
+const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 // Common
 int i;
@@ -121,10 +124,15 @@ void initRF24()
   radio.begin(); // Start up the radio
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  radio.openWritingPipe(addresses[1]); // Write to device address '2Node'
-  radio.openReadingPipe(1,addresses[0]); // Read on pipe 1 for device address '1Node'
+  //radio.openWritingPipe(addresses[1]); // Write to device address '2Node'
+  //radio.openReadingPipe(1,addresses[0]); // Read on pipe 1 for device address '1Node'
+  radio.openWritingPipe(pipes[1]); // Write to device address '2Node'
+  radio.openReadingPipe(1,pipes[0]); // Read on pipe 1 for device address '1Node'
+  
+  
   radio.startListening(); // Start listening
 }
+
 
 void sendRF24() {
   radio.stopListening(); // First, stop listening so we can talk.
