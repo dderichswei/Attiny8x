@@ -32,9 +32,9 @@
  * 
  */
 
-
+// PIR
+#define PIR 10
     
-
 // Deep Sleep
 #include <avr/sleep.h>
 #ifndef cbi
@@ -44,8 +44,7 @@
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-volatile bool slept;
-#define GREENLED 7
+// volatile bool slept;
 
 // Watchdog Sleep
 #include <avr/wdt.h>
@@ -59,17 +58,11 @@ RF24 radio(CE_PIN, CSN_PIN);
 byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
 
-// Define Diode PIN
-#define DIODE 0
-
 // Common
 int i;
 
 void setup() {
-    slept = false;
-    pinMode(GREENLED, OUTPUT);
-    pinMode(DIODE, OUTPUT);
-    pinMode(DIODE, LOW);
+    pinMode(PIR, INPUT);
     sbi(GIMSK,PCIE0); // Turn on Pin Change interrupt
     sbi(PCMSK0,PCINT0); // Which pins are affected by the interrupt
  
@@ -105,22 +98,21 @@ void loop() {
   }
 
   turnOFFRF24(); 
-  radio.powerDown();
   ddsleep();
+  while (digitalRead(PIR) == LOW) {
+  ddsleep();
+    }
   radio.powerUp();
-
  
 
 }
 
 void turnONRF24() {
-  digitalWrite(DIODE, HIGH);
   initRF24();
 }
 
 void turnOFFRF24() {
-  //radio.powerDown();
-  digitalWrite(DIODE, LOW);
+  radio.powerDown();
 }
 
 void initRF24()
@@ -179,18 +171,9 @@ sei(); // Enable interrupts
 } // sleep
 
 ISR(PCINT0_vect) {
-  slept = true;
-  digitalWrite(GREENLED, HIGH);
-  digitalWrite(DIODE, HIGH);
-
-  //radio.powerUp();
 }
 
 ISR(PCINT1_vect) {
-  slept = true; 
-  digitalWrite(GREENLED, HIGH);
-  digitalWrite(DIODE, HIGH);
-  //radio.powerUp();
 }
 
 // watchdog interrupt
