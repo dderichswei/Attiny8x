@@ -58,6 +58,7 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Topology and Payload
 //byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
+char payload2[15] = "DD0001";
 const int max_payload_size = 32;
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
@@ -80,8 +81,10 @@ void loop() {
 
   
   radio.stopListening(); // First, stop listening so we can talk.
-  payload++;
-  radio.write( &payload, sizeof(unsigned long) );
+  //payload++;
+  //payload2=batLevel();
+  //radio.write( &payload, sizeof(unsigned long) );
+  radio.write( &payload2, sizeof(payload2) );
   radio.startListening(); // Now, continue listening
 
   unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
@@ -240,10 +243,12 @@ void initADC()
             (1 << ADLAR) |     // left shift result
             (0 << REFS1) |     // Sets ref. voltage to VCC, bit 1
             (0 << REFS0) |     // Sets ref. voltage to VCC, bit 0
+            (1 << MUX5)  |     // use ADC2 for input (PB4), MUX bit 3
+            (0 << MUX4)  |     // use ADC2 for input (PB4), MUX bit 3
             (0 << MUX3)  |     // use ADC2 for input (PB4), MUX bit 3
             (0 << MUX2)  |     // use ADC2 for input (PB4), MUX bit 2
-            (1 << MUX1)  |     // use ADC2 for input (PB4), MUX bit 1
-            (0 << MUX0);       // use ADC2 for input (PB4), MUX bit 0
+            (0 << MUX1)  |     // use ADC2 for input (PB4), MUX bit 1
+            (1 << MUX0);       // use ADC2 for input (PB4), MUX bit 0
 
   ADCSRA = 
             (1 << ADEN)  |     // Enable ADC 
@@ -267,16 +272,16 @@ int batLevel()
     while (ADCSRA & (1 << ADSC) ); // wait till conversion complete 
 
     // for 10-bit resolution:
-    adc_lobyte = ADCL; // get the sample value from ADCL
-    raw_adc = ADCH<<8 | adc_lobyte;   // add lobyte and hibyte
+    //adc_lobyte = ADCL; // get the sample value from ADCL
+    //raw_adc = ADCH<<8 | adc_lobyte;   // add lobyte and hibyte
 
-    if (raw_adc > 512)  // ADC input voltage is more than half of the internal 1.1V reference voltage
+    if (ADCH > 128)  // ADC input voltage is more than half of the internal 1.1V reference voltage
     {
-     level = 1;
+     level=43;
      
     } else {      // ADC input voltage is less than half of the internal 1.1V reference voltage
 
-     level = 0;
+     level=41;
     }
 
   }
