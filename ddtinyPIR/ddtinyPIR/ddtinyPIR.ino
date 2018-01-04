@@ -1,17 +1,17 @@
 /*
  * ddtinyPIR
- * 
- * based on Attiny84 
- * 
+ *
+ * based on Attiny84
+ *
  * aim: low current consumption
- * 
+ *
  * parts needed:
  *  Attiny84 (of course)
- *  NRF24L01+ 
+ *  NRF24L01+
  *  MINIPIR
- * 
+ *
  * How to connect the ATTINY84 with the RF24:
- * 
+ *
  *     ATtiny24/44/84 Pin map with CE_PIN 8 and CSN_PIN 7
   Schematic provided and successfully tested by Carmine Pastore (https://github.com/Carminepz)
                                        +-\/-+
@@ -23,18 +23,18 @@
                             (03) PA7  6|    |9  (06) PA4 --- nRF24L01  SCK, pin5
     nRF24L01 MOSI, pin7 --- (04) PA6  7|    |8  (05) PA5 --- nRF24L01 MISO, pin6
                                        +----+
- * 
- * it only works if you set PIN MAPPING to: Counterclockwise 
- * 
- * 
- * 
- * 
- * 
+ *
+ * it only works if you set PIN MAPPING to: Counterclockwise
+ *
+ *
+ *
+ *
+ *
  */
 
 // PIR
 #define PIR 10
-    
+
 // Deep Sleep
 #include <avr/sleep.h>
 #ifndef cbi
@@ -69,7 +69,7 @@ void setup() {
     pinMode(PIR, INPUT);
     sbi(GIMSK,PCIE0); // Turn on Pin Change interrupt
     sbi(PCMSK0,PCINT0); // Which pins are affected by the interrupt
- 
+
 }
 
 void loop() {
@@ -79,7 +79,7 @@ void loop() {
 
   turnONRF24();
 
-  
+
   radio.stopListening(); // First, stop listening so we can talk.
   //payload++;
   //payload2=batLevel();
@@ -105,7 +105,7 @@ void loop() {
 
   // delay(500);
 
-  turnOFFRF24(); 
+  turnOFFRF24();
   ddsleep();
   while (digitalRead(PIR) == LOW) {
   ddsleep();
@@ -136,8 +136,8 @@ void initRF24()
   //radio.openReadingPipe(1,addresses[0]); // Read on pipe 1 for device address '1Node'
   radio.openWritingPipe(pipes[1]); // Write to device address '2Node'
   radio.openReadingPipe(1,pipes[0]); // Read on pipe 1 for device address '1Node'
-  
-  
+
+
   radio.startListening(); // Start listening
 }
 
@@ -193,42 +193,42 @@ ISR(PCINT1_vect) {
 }
 
 // watchdog interrupt
-ISR(WDT_vect) 
+ISR(WDT_vect)
   {
    wdt_disable();  // disable watchdog
    radio.powerUp();
   }
 
 
-void myWatchdogEnable(const byte interval) 
-  {  
-  // radio.powerDown();  
+void myWatchdogEnable(const byte interval)
+  {
+  // radio.powerDown();
   MCUSR = 0;                          // reset various flags
   WDTCSR |= 0b00011000;               // see docs, set WDCE, WDE
   WDTCSR =  0b01000000 | interval;    // set WDIE, and appropriate delay
   cbi(ADCSRA,ADEN); // Switch Analog to Digital converter OFF
   wdt_reset();
-  set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
+  set_sleep_mode (SLEEP_MODE_PWR_DOWN);
   sleep_mode();            // now goes to Sleep and waits for the interrupt
   sbi(ADCSRA,ADEN);  // Switch Analog to Digital converter ON
-  } 
+  }
 
 
 void initADC()
 {
-  /* this function initialises the ADC 
+  /* this function initialises the ADC
 
         ADC Prescaler Notes:
   --------------------
 
      ADC Prescaler needs to be set so that the ADC input frequency is between 50 - 200kHz.
-  
-           For more information, see table 17.5 "ADC Prescaler Selections" in 
+
+           For more information, see table 17.5 "ADC Prescaler Selections" in
            chapter 17.13.2 "ADCSRA – ADC Control and Status Register A"
           (pages 140 and 141 on the complete ATtiny25/45/85 datasheet, Rev. 2586M–AVR–07/10)
 
            Valid prescaler values for various clock speeds
-  
+
        Clock   Available prescaler values
            ---------------------------------------
              1 MHz   8 (125kHz), 16 (62.5kHz)
@@ -255,15 +255,15 @@ void initADC()
             (0 << MUX1)  |     // use ADC2 for input (PB4), MUX bit 1
             (1 << MUX0);       // use ADC2 for input (PB4), MUX bit 0
 
-  ADCSRA = 
-            (1 << ADEN)  |     // Enable ADC 
-            (0 << ADPS2) |     // set prescaler to 64, bit 2 
-            (1 << ADPS1) |     // set prescaler to 64, bit 1 
-            (1 << ADPS0);      // set prescaler to 64, bit 0  
+  ADCSRA =
+            (1 << ADEN)  |     // Enable ADC
+            (0 << ADPS2) |     // set prescaler to 64, bit 2
+            (1 << ADPS1) |     // set prescaler to 64, bit 1
+            (1 << ADPS0);      // set prescaler to 64, bit 0
 }
 
 
-int batLevel()
+int batLevel() // does not work yet
 {
   initADC();
   int level = 42;
@@ -274,7 +274,7 @@ int batLevel()
   {
 
     ADCSRA |= (1 << ADSC);         // start ADC measurement
-    while (ADCSRA & (1 << ADSC) ); // wait till conversion complete 
+    while (ADCSRA & (1 << ADSC) ); // wait till conversion complete
 
     // for 10-bit resolution:
     //adc_lobyte = ADCL; // get the sample value from ADCL
@@ -283,7 +283,7 @@ int batLevel()
     if (ADCH > 128)  // ADC input voltage is more than half of the internal 1.1V reference voltage
     {
      level=43;
-     
+
     } else {      // ADC input voltage is less than half of the internal 1.1V reference voltage
 
      level=41;
@@ -292,4 +292,3 @@ int batLevel()
   }
  return level;
 }
-
