@@ -58,7 +58,7 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Topology and Payload
 //byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
-char payload2[15] = "DD0001";
+char payload2[15] = "DD0004";
 const int max_payload_size = 32;
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
@@ -103,13 +103,15 @@ void loop() {
     radio.read( &got_time, sizeof(unsigned long) );
   }
 
+  // delay(500);
+
   turnOFFRF24(); 
   ddsleep();
   while (digitalRead(PIR) == LOW) {
   ddsleep();
     }
   radio.powerUp();
- 
+
 
 }
 
@@ -125,6 +127,9 @@ void initRF24()
 {
   // Setup and configure rf radio
   radio.begin(); // Start up the radio
+  radio.setPALevel(RF24_PA_MAX);
+  radio.setDataRate(RF24_250KBPS);
+  radio.setCRCLength(RF24_CRC_8);
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
   //radio.openWritingPipe(addresses[1]); // Write to device address '2Node'
