@@ -240,7 +240,7 @@ void initADC()
            (check the datasheet for the proper bit values to set the prescaler)
   */
 
-  // 8-bit resolution
+  // 8-bit resolution -
   // set ADLAR to 1 to enable the Left-shift result (only bits ADC9..ADC2 are available)
   // then, only reading ADCH is sufficient for 8-bit results (256 values)
 
