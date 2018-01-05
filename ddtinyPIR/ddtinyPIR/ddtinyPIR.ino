@@ -36,7 +36,11 @@
 #define PIR 10
 
 // Phototransitor connected currently with 20kOHM to Ground.
-#define PHO 09
+#define PHO 9
+
+// Debug LED
+#define LED 3
+
 
 // Deep Sleep
 #include <avr/sleep.h>
@@ -47,13 +51,19 @@
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
+// Batterielevel
+int battery_Level = 0;
+
+volatile bool blinkit;
 // volatile bool slept;
 
 // Watchdog Sleep
 #include <avr/wdt.h>
 
+
 // nRF24L01 setup
 #include "RF24.h"
+
 #define CE_PIN 8          // 8 select Counterclockwise for PIN MAPPING in ARDUINO
 #define CSN_PIN 7         // 7 select Counterclockwise for PIN MAPPING in ARDUINO
 RF24 radio(CE_PIN, CSN_PIN);
@@ -65,27 +75,38 @@ char payload2[6] = "DD0001";
 const int max_payload_size = 32;
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
-// Common
-int i;
-
 void setup() {
+    pinMode(PHO, INPUT);
     pinMode(PIR, INPUT);
     sbi(GIMSK,PCIE0); // Turn on Pin Change interrupt
     sbi(PCMSK0,PCINT0); // Which pins are affected by the interrupt
-
 }
 
 void loop() {
   turnONRF24();
   sendRF24();
+  //sendBatLevel();
   turnOFFRF24();
   ddsleep();
   while (digitalRead(PIR) == LOW) {
   ddsleep();
-    }
+  }
   radio.powerUp();
+}
 
-
+void blinkLed()
+{
+  if (blinkit) {
+    digitalWrite(LED, HIGH);
+    delay(500);
+    blinkit = false;
+  }
+  else
+  {
+    digitalWrite(LED, LOW); 
+    delay(500);   
+    blinkit = true;
+  }
 }
 
 void turnONRF24() {
@@ -105,8 +126,6 @@ void initRF24()
   radio.setCRCLength(RF24_CRC_8);
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  //radio.openWritingPipe(addresses[1]); // Write to device address '2Node'
-  //radio.openReadingPipe(1,addresses[0]); // Read on pipe 1 for device address '1Node'
   radio.openWritingPipe(pipes[1]); // Write to device address '2Node'
   radio.openReadingPipe(1,pipes[0]); // Read on pipe 1 for device address '1Node'
   radio.startListening(); // Start listening
@@ -133,8 +152,35 @@ void sendRF24() {
     unsigned long got_time; // Grab the response, compare, and send to debugging spew
     radio.read( &got_time, sizeof(unsigned long) );
   }
-
+  // if (blinkit) { blinkit = false; }
+  // else { blinkit = true; }
 }
+
+void sendBatLevel() {
+  batLevel();
+  radio.stopListening(); // First, stop listening so we can talk.
+  radio.write( &payload, sizeof(payload) );
+  radio.startListening(); // Now, continue listening
+
+  unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
+  boolean timeout = false; // Set up a variable to indicate if a response was received or not
+
+  while ( !radio.available() ){ // While nothing is received
+    if (micros() - started_waiting_at > 200000 ){ // If waited longer than 200ms, indicate timeout and exit while loop
+      timeout = true;
+      break;
+    }
+
+  }
+
+  if ( !timeout ){ // Describe the results
+    unsigned long got_time; // Grab the response, compare, and send to debugging spew
+    radio.read( &got_time, sizeof(unsigned long) );
+  }
+  // if (blinkit) { blinkit = false; }
+  // else { blinkit = true; }
+}
+
 
 
 void ddsleep() {
@@ -168,7 +214,6 @@ ISR(PCINT1_vect) {
 ISR(WDT_vect)
   {
    wdt_disable();  // disable watchdog
-   radio.powerUp();
   }
 
 
@@ -188,79 +233,45 @@ void myWatchdogEnable(const byte interval)
 
 void initADC()
 {
-  /* this function initialises the ADC
+  /// THIS is a working routine for ATTINY84 with 1 MHZ.
 
-        ADC Prescaler Notes:
-  --------------------
-
-     ADC Prescaler needs to be set so that the ADC input frequency is between 50 - 200kHz.
-
-           For more information, see table 17.5 "ADC Prescaler Selections" in
-           chapter 17.13.2 "ADCSRA – ADC Control and Status Register A"
-          (pages 140 and 141 on the complete ATtiny25/45/85 datasheet, Rev. 2586M–AVR–07/10)
-
-           Valid prescaler values for various clock speeds
-
-       Clock   Available prescaler values
-           ---------------------------------------
-             1 MHz   8 (125kHz), 16 (62.5kHz)
-             4 MHz   32 (125kHz), 64 (62.5kHz)
-             8 MHz   64 (125kHz), 128 (62.5kHz)
-            16 MHz   128 (125kHz)
-
-           Below example set prescaler to 128 for mcu running at 8MHz
-           (check the datasheet for the proper bit values to set the prescaler)
-  */
-
-  // 8-bit resolution -
-  // set ADLAR to 1 to enable the Left-shift result (only bits ADC9..ADC2 are available)
-  // then, only reading ADCH is sufficient for 8-bit results (256 values)
 
   ADMUX =
-            (1 << ADLAR) |     // left shift result
-            (0 << REFS1) |     // Sets ref. voltage to VCC, bit 1
-            (0 << REFS0) |     // Sets ref. voltage to VCC, bit 0
-            (1 << MUX5)  |     // use ADC2 for input (PB4), MUX bit 3
-            (0 << MUX4)  |     // use ADC2 for input (PB4), MUX bit 3
-            (0 << MUX3)  |     // use ADC2 for input (PB4), MUX bit 3
-            (0 << MUX2)  |     // use ADC2 for input (PB4), MUX bit 2
-            (0 << MUX1)  |     // use ADC2 for input (PB4), MUX bit 1
-            (1 << MUX0);       // use ADC2 for input (PB4), MUX bit 0
+            (0 << REFS1) |     // Sets ref. voltage to Vcc, bit 1   
+            (0 << REFS0) |     // Sets ref. voltage to Vcc, bit 0
+            (0 << MUX5)  |     // use ADC1 for input (PA1), MUX bit 5
+            (0 << MUX4)  |     // use ADC1 for input (PA1), MUX bit 4
+            (0 << MUX3)  |     // use ADC1 for input (PA1), MUX bit 3
+            (0 << MUX2)  |     // use ADC1 for input (PA1), MUX bit 2
+            (0 << MUX1)  |     // use ADC1 for input (PA1), MUX bit 1
+            (1 << MUX0);       // use ADC1 for input (PA1), MUX bit 0
 
-  ADCSRA =
-            (1 << ADEN)  |     // Enable ADC
-            (0 << ADPS2) |     // set prescaler to 64, bit 2
-            (1 << ADPS1) |     // set prescaler to 64, bit 1
-            (1 << ADPS0);      // set prescaler to 64, bit 0
+  ADCSRA = 
+            (1 << ADEN)  |     // Enable ADC 
+            (1 << ADPS2) |     // set prescaler to 16, bit 2 
+            (0 << ADPS1) |     // set prescaler to 16, bit 1 
+            (0 << ADPS0);      // set prescaler to 16, bit 0 
+  ADCSRB = 
+            (1 << ADLAR);      // left shift result (for 8-bit values)
+  //        (0 << ADLAR);      // right shift result (for 10-bit values)
 }
 
 
-int batLevel() // does not work yet
+void batLevel() // does not work yet
 {
-  initADC();
-  int level = 42;
-  uint8_t adc_lobyte; // to hold the low byte of the ADC register (ADCL)
-  uint16_t raw_adc;
+ initADC();
 
   while(1)
   {
 
     ADCSRA |= (1 << ADSC);         // start ADC measurement
-    while (ADCSRA & (1 << ADSC) ); // wait till conversion complete
+    while (ADCSRA & (1 << ADSC) ); // wait till conversion complete 
 
-    // for 10-bit resolution:
-    //adc_lobyte = ADCL; // get the sample value from ADCL
-    //raw_adc = ADCH<<8 | adc_lobyte;   // add lobyte and hibyte
-
-    if (ADCH > 128)  // ADC input voltage is more than half of the internal 1.1V reference voltage
-    {
-     level=43;
-
-    } else {      // ADC input voltage is less than half of the internal 1.1V reference voltage
-
-     level=41;
-    }
-
+    if (ADCH > 128) {  payload = 65; }        // ADC input voltage is more than half of VCC } 
+    else if (ADCH > 100) { payload = 66; }    // B
+    else if (ADCH > 72)  { payload = 67; }    // C
+    else if (ADCH > 44)  { payload = 68; }    // D
+    else { payload = 70; } // ADC input voltage is less than half of VCC   
+   return 0;
   }
- return level;
 }
