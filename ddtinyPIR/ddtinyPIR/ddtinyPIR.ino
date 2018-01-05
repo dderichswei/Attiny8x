@@ -35,6 +35,9 @@
 // PIR
 #define PIR 10
 
+// Phototransitor connected currently with 20kOHM to Ground.
+#define PHO 09
+
 // Deep Sleep
 #include <avr/sleep.h>
 #ifndef cbi
@@ -58,7 +61,7 @@ RF24 radio(CE_PIN, CSN_PIN);
 // Topology and Payload
 //byte addresses[][6] = {"1Node","2Node"};
 unsigned long payload = 0;
-char payload2[15] = "DD0004";
+char payload2[6] = "DD0001";
 const int max_payload_size = 32;
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
@@ -73,38 +76,8 @@ void setup() {
 }
 
 void loop() {
- // initRF24();
- // sendRF24();
-
-
   turnONRF24();
-
-
-  radio.stopListening(); // First, stop listening so we can talk.
-  //payload++;
-  //payload2=batLevel();
-  //radio.write( &payload, sizeof(unsigned long) );
-  radio.write( &payload2, sizeof(payload2) );
-  radio.startListening(); // Now, continue listening
-
-  unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
-  boolean timeout = false; // Set up a variable to indicate if a response was received or not
-
-  while ( !radio.available() ){ // While nothing is received
-    if (micros() - started_waiting_at > 200000 ){ // If waited longer than 200ms, indicate timeout and exit while loop
-      timeout = true;
-      break;
-    }
-
-  }
-
-  if ( !timeout ){ // Describe the results
-    unsigned long got_time; // Grab the response, compare, and send to debugging spew
-    radio.read( &got_time, sizeof(unsigned long) );
-  }
-
-  // delay(500);
-
+  sendRF24();
   turnOFFRF24();
   ddsleep();
   while (digitalRead(PIR) == LOW) {
@@ -136,16 +109,13 @@ void initRF24()
   //radio.openReadingPipe(1,addresses[0]); // Read on pipe 1 for device address '1Node'
   radio.openWritingPipe(pipes[1]); // Write to device address '2Node'
   radio.openReadingPipe(1,pipes[0]); // Read on pipe 1 for device address '1Node'
-
-
   radio.startListening(); // Start listening
 }
 
 
 void sendRF24() {
   radio.stopListening(); // First, stop listening so we can talk.
-  payload++;
-  radio.write( &payload, sizeof(unsigned long) );
+  radio.write( &payload2, sizeof(payload2) );
   radio.startListening(); // Now, continue listening
 
   unsigned long started_waiting_at = micros(); // Set up a timeout period, get the current microseconds
@@ -163,7 +133,9 @@ void sendRF24() {
     unsigned long got_time; // Grab the response, compare, and send to debugging spew
     radio.read( &got_time, sizeof(unsigned long) );
   }
+
 }
+
 
 void ddsleep() {
 
