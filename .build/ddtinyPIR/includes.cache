@@ -1,0 +1,27 @@
+[
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tiny"
+  },
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\variants\\tinyX4"
+  },
+  {
+    "Sourcefile": "d:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Attiny8x\\.build\\ddtinyPIR\\sketch\\ddtinyPIR.ino.cpp",
+    "Include": "RF24.h",
+    "Includepath": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Quick\\libraries\\RF24"
+  },
+  {
+    "Sourcefile": "d:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Attiny8x\\.build\\ddtinyPIR\\sketch\\ddtinyPIR.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Quick\\libraries\\RF24\\RF24.cpp",
+    "Include": "",
+    "Includepath": ""
+  }
+]

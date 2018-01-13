@@ -5,7 +5,9 @@
             "includePath": [
                 "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\empty",
                 "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tiny",
-                "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tinymodern"
+                "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tinymodern",
+                "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Quick\\libraries",
+                "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\libraries"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": false,

@@ -1,0 +1,10 @@
+{
+  "builtInLibrariesFolders": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\libraries",
+  "customBuildProperties": "build.warn_data_percentage=75,runtime.tools.avr-gcc.path=D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware\\tools\\avr,runtime.tools.avrdude.path=D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware\\tools\\avr,runtime.tools.arduinoOTA.path=D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware\\tools\\avr",
+  "fqbn": "ATTinyCore:avr:attinyx4:LTO=disable,chip=84,clock=1internal,bod=disable,pinmapping=old",
+  "hardwareFolders": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware,D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware,C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages",
+  "otherLibrariesFolders": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Quick\\libraries,D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\libraries",
+  "runtime.ide.version": "10600",
+  "sketchLocation": "d:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\Attiny8x\\ddtinyPIR\\ddtinyPIR\\ddtinyPIR.ino",
+  "toolsFolders": "D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\tools-builder,D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware\\tools\\avr,D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\tools-builder,D:\\DATA\\Nextcloud\\DD-DEVBOX\\Arduino\\arduino-1.8.3\\hardware\\tools\\avr,C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages"
+}
