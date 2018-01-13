@@ -1,0 +1,5 @@
+{
+    "board": "ATTinyCore:avr:attinyx4",
+    "configuration": "LTO=disable,chip=84,clock=1internal,bod=disable,pinmapping=anew",
+    "port": "COM4"
+}

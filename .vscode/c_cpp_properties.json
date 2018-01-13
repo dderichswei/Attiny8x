@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\empty",
+                "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tiny",
+                "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tinymodern"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\empty",
+                    "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tiny",
+                    "C:\\Users\\dderi\\AppData\\Local\\Arduino15\\packages\\ATTinyCore\\hardware\\avr\\1.1.4\\cores\\tinymodern"
+                ]
+            },
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 3
+}
